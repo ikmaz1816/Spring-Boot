@@ -1,0 +1,28 @@
+version: '1'
+services:
+  mysqldb:
+    image: mysql:8
+    container_name: mysqldb
+    networks:
+      - my-network
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_DATABASE=project
+    healthcheck:
+      test: ['CMD','mysqladmin','ping','-h','localhost']
+      timeout: 20s
+      retries: 10
+
+  myapp1:
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    networks:
+      - my-network
+    container_name: myapp1
+
+networks:
+  my-network:
