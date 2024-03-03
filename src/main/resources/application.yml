@@ -3,10 +3,11 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
   datasource:
-    url: jdbc:mysql://localhost:3306/student
+    url: jdbc:mysql://mysqldb/project?createDatabaseIfNotExists=true&autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
     username: root
     password: admin
 server:
-  port: 8081
+  port: 8080
 
