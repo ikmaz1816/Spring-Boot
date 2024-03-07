@@ -1,0 +1,90 @@
+#Create persitent volume
+#apiVersion: v1
+#kind: PersistentVolume
+#metadata:
+#  name: persistent-volume
+#spec:
+#  capacity:
+#    storage: 4Gi
+#  accessModes:
+#    - ReadWriteOnce
+#  storageClassName: standard
+#  hostPath:
+#    type: DirectoryOrCreate
+#    path: /data/
+#hostPath cannot be used for multiple nodes
+
+
+---
+#Create persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: persistent-volume-claim
+spec:
+  #volumeName: persistent-volume
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+#Create deployment file
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: database
+      app: backend
+  template:
+    metadata:
+      name: database-pod
+      labels:
+        name: database
+        app: backend
+    spec:
+      containers:
+        - name: database-deploy
+          image: mysql:8
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: config
+                  key: database
+          volumeMounts:
+            - name: my-volume
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: my-volume
+          persistentVolumeClaim:
+            claimName: persistent-volume-claim
+---
+#to create a service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql  #same as host as it is used for connection with the pod
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    name: database
+    app: backend
+  clusterIP: None
+
