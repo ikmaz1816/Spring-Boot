@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("student")
+@RestController
+@RequestMapping(value = "student")
 public class StudentController {
     @Autowired
     private StudentService studentService;
@@ -60,7 +61,6 @@ public class StudentController {
         }
         logger.info("Process Completed successfully");
         return student;
-
     }
     @GetMapping("/getStudents")
     @ResponseBody

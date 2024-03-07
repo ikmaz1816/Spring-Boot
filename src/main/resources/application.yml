@@ -5,9 +5,14 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect
   datasource:
-    url: jdbc:mysql://mysqldb/project?createDatabaseIfNotExists=true&autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
-    username: root
-    password: admin
+    #in case of docker-compose we can write it directly
+    #jdbc:mysql://{nameOfhostprovidedincomposefile}/database??createDatabaseIfNotExists=true&autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST}/${DB_NAME}?useSSL=false
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      initialization-fail-timeout: 0
 server:
   port: 8080
 
